@@ -889,17 +889,18 @@ function getData(dataFormat) {
 }
 
 function updateQRHeader() {
-  let teamNumber = document.getElementById("input_t").value;
-  let teamName = getTeamName(teamNumber);
+  const teamNumber = document.getElementById("input_t").value;
+  const teamName = getTeamName(teamNumber);
 
   if (teamNumber && teamName) {
-    document.getElementById("display_qr-info").textContent = `Scouting Team ${teamNumber} – ${teamName}`;
+    document.getElementById("display_qr-info").textContent = `Team ${teamNumber} – ${teamName}`;
   } else if (teamNumber) {
-    document.getElementById("display_qr-info").textContent = `Scouting Team ${teamNumber}`;
+    document.getElementById("display_qr-info").textContent = `Team ${teamNumber}`;
   } else {
-    document.getElementById("display_qr-info").textContent = `Scouting Info`;
+    document.getElementById("display_qr-info").textContent = `Team Info`;
   }
 }
+
 
 
 
@@ -1210,16 +1211,10 @@ function getIdBase(name) {
 }
 
 function getTeamName(teamNumber) {
-  if (teamNumber !== undefined) {
-    if (teams) {
-      var teamKey = "frc" + teamNumber;
-      var ret = "";
-      Array.from(teams).forEach(team => ret = team.key == teamKey ? team.nickname : ret);
-      return ret;
-    }
-  }
-  return "";
+  let row = scoutingSchedule.find(entry => entry.team_number == teamNumber);
+  return row ? row.team_name : "";
 }
+
 
 
 function getCurrentTeamNumberFromRobot() {
