@@ -1228,8 +1228,13 @@ function getTeamName(teamNumber) {
 
 
 function getCurrentTeamNumberFromRobot() {
-  let match = document.getElementById("input_m").value;
-  let robot = document.getElementById("input_r").value;
+  let matchEl = document.getElementById("input_m");
+  let robotEl = document.querySelector('input[name="r"]:checked');
+
+  if (!matchEl || !robotEl) return "";
+
+  let match = matchEl.value;
+  let robot = robotEl.value;
 
   let row = scoutingSchedule.find(entry => 
     entry.match == match && entry.robot.toLowerCase() == robot.toLowerCase()
@@ -1240,16 +1245,16 @@ function getCurrentTeamNumberFromRobot() {
 
 
 
-function updateMatchStart(event) {
-  const match = document.getElementById("input_m").value;
-  const robot = document.querySelector('input[name="r"]:checked')?.value;
 
-  if (match && robot) {
-    const team = getCurrentTeamNumberFromRobot();
+function updateMatchStart(event) {
+  const team = getCurrentTeamNumberFromRobot();
+
+  if (team) {
     document.getElementById("input_t").value = team;
     onTeamnameChange();
   }
 }
+
 
 
 
