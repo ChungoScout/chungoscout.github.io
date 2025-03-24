@@ -1424,7 +1424,7 @@ function copyData(){
 let scoutingSchedule = [];
 
 function loadScoutingCSV() {
-  Papa.parse("data/schedule.csv", {
+  Papa.parse("data/teams.csv", {
     download: true,
     header: true,
     complete: function(results) {
