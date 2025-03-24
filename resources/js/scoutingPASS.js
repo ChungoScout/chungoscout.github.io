@@ -889,25 +889,38 @@ function getData(dataFormat) {
 }
 
 function updateQRHeader() {
+  
+  const display = document.getElementById("display_qr-info");
   const matchInput = document.getElementById("input_m");
   const robotInput = document.getElementById("input_r");
 
-  // Bail early if elements aren't present yet
-  if (!matchInput || !robotInput) return;
+  // Exit early if the required elements don't exist
+  if (!display || !matchInput || !robotInput) {
+    console.warn("Missing DOM elements for QR header");
+    return;
+  }
 
   const match = matchInput.value;
   const robot = robotInput.value;
 
-  let row = scoutingSchedule.find(entry =>
+  if (!match || !robot) {
+    display.textContent = "Scouting Info";
+    return;
+  }
+
+  const row = scoutingSchedule.find(entry =>
     entry.match == match && entry.robot.toLowerCase() == robot.toLowerCase()
   );
 
-  if (row) {
-    document.getElementById("display_qr-info").textContent = `Team ${row.team_number} – ${row.team_name}`;
+  if (row && row.team_number && row.team_name) {
+    display.textContent = `Team ${row.team_number} – ${row.team_name}`;
   } else {
-    document.getElementById("display_qr-info").textContent = `Team Info`;
+    display.textContent = `Scouting Info`;
   }
+  console.log("Match:", match, "Robot:", robot, "Row:", row);
+
 }
+
 
 
 
