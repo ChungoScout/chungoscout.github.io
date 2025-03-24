@@ -889,8 +889,14 @@ function getData(dataFormat) {
 }
 
 function updateQRHeader() {
-  const match = document.getElementById("input_m").value;
-  const robot = document.getElementById("input_r").value;
+  const matchInput = document.getElementById("input_m");
+  const robotInput = document.getElementById("input_r");
+
+  // Bail early if elements aren't present yet
+  if (!matchInput || !robotInput) return;
+
+  const match = matchInput.value;
+  const robot = robotInput.value;
 
   let row = scoutingSchedule.find(entry =>
     entry.match == match && entry.robot.toLowerCase() == robot.toLowerCase()
@@ -902,6 +908,7 @@ function updateQRHeader() {
     document.getElementById("display_qr-info").textContent = `Team Info`;
   }
 }
+
 
 
 
