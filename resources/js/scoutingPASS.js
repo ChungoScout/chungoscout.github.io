@@ -889,37 +889,24 @@ function getData(dataFormat) {
 }
 
 function updateQRHeader() {
-  
-  const display = document.getElementById("display_qr-info");
-  const matchInput = document.getElementById("input_m");
-  const robotInput = document.getElementById("input_r");
-
-  // Exit early if the required elements don't exist
-  if (!display || !matchInput || !robotInput) {
-    console.warn("Missing DOM elements for QR header");
+  const span = document.getElementById("display_qr-info");
+  if (!span) {
+    console.log("Missing DOM elements for QR header");
     return;
   }
 
-  const match = matchInput.value;
-  const robot = robotInput.value;
+  let teamNumber = document.getElementById("input_t")?.value;
+  let teamName = getTeamName(teamNumber);
 
-  if (!match || !robot) {
-    display.textContent = "Scouting Info";
-    return;
-  }
-
-  const row = scoutingSchedule.find(entry =>
-    entry.match == match && entry.robot.toLowerCase() == robot.toLowerCase()
-  );
-
-  if (row && row.team_number && row.team_name) {
-    display.textContent = `Team ${row.team_number} – ${row.team_name}`;
+  if (teamNumber && teamName) {
+    span.textContent = `Scouting Team ${teamNumber} – ${teamName}`;
+  } else if (teamNumber) {
+    span.textContent = `Scouting Team ${teamNumber}`;
   } else {
-    display.textContent = `Scouting Info`;
+    span.textContent = `Scouting Info`;
   }
-  console.log("Match:", match, "Robot:", robot, "Row:", row);
-
 }
+
 
 
 
