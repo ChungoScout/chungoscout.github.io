@@ -889,21 +889,26 @@ function getData(dataFormat) {
 }
 
 function updateQRHeader() {
-  let str = 'Event: !EVENT! Match: !MATCH! Robot: !ROBOT! Team: !TEAM!';
+  const teamNum = document.getElementById("input_t")?.value || "";
+  const teamName = getTeamName(teamNum);
+
+  let str = "";
 
   if (!pitScouting) {
-    str = str
-      .replace('!EVENT!', 'UnknownEvent')
-      .replace('!MATCH!', document.getElementById("input_m").value)
-      .replace('!ROBOT!', document.getElementById("display_r").value)
-      .replace('!TEAM!', document.getElementById("input_t").value);
+    if (teamNum && teamName) {
+      str = `Team ${teamNum} – ${teamName}`;
+    } else if (teamNum) {
+      str = `Team ${teamNum}`;
+    } else {
+      str = `No team selected`;
+    }
   } else {
-    str = 'Pit Scouting - Team !TEAM!'
-      .replace('!TEAM!', document.getElementById("input_t").value);
+    str = 'Pit Scouting - Team ' + teamNum;
   }
 
   document.getElementById("display_qr-info").textContent = str;
 }
+
 
 
 function qr_regenerate() {
