@@ -889,25 +889,18 @@ function getData(dataFormat) {
 }
 
 function updateQRHeader() {
-  const teamNum = document.getElementById("input_t")?.value || "";
-  const teamName = getTeamName(teamNum);
+  let teamNumber = document.getElementById("input_t").value;
+  let teamName = getTeamName(teamNumber);
 
-  let str = "";
-
-  if (!pitScouting) {
-    if (teamNum && teamName) {
-      str = `Team ${teamNum} – ${teamName}`;
-    } else if (teamNum) {
-      str = `Team ${teamNum}`;
-    } else {
-      str = `No team selected`;
-    }
+  if (teamNumber && teamName) {
+    document.getElementById("display_qr-info").textContent = `Scouting Team ${teamNumber} – ${teamName}`;
+  } else if (teamNumber) {
+    document.getElementById("display_qr-info").textContent = `Scouting Team ${teamNumber}`;
   } else {
-    str = 'Pit Scouting - Team ' + teamNum;
+    document.getElementById("display_qr-info").textContent = `Scouting Info`;
   }
-
-  document.getElementById("display_qr-info").textContent = str;
 }
+
 
 
 
