@@ -889,17 +889,20 @@ function getData(dataFormat) {
 }
 
 function updateQRHeader() {
-  const teamNumber = document.getElementById("input_t").value;
-  const teamName = getTeamName(teamNumber);
+  const match = document.getElementById("input_m").value;
+  const robot = document.getElementById("input_r").value;
 
-  if (teamNumber && teamName) {
-    document.getElementById("display_qr-info").textContent = `Team ${teamNumber} – ${teamName}`;
-  } else if (teamNumber) {
-    document.getElementById("display_qr-info").textContent = `Team ${teamNumber}`;
+  let row = scoutingSchedule.find(entry =>
+    entry.match == match && entry.robot.toLowerCase() == robot.toLowerCase()
+  );
+
+  if (row) {
+    document.getElementById("display_qr-info").textContent = `Team ${row.team_number} – ${row.team_name}`;
   } else {
     document.getElementById("display_qr-info").textContent = `Team Info`;
   }
 }
+
 
 
 
@@ -1227,10 +1230,7 @@ function getCurrentTeamNumberFromRobot() {
 
   return row ? row.team_number : "";
 }
-function getTeamName(teamNumber) {
-  let row = scoutingSchedule.find(entry => entry.team_number == teamNumber);
-  return row ? row.team_name : "";
-}
+
 
 
 function updateMatchStart(event) {
