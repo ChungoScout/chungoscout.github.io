@@ -1222,14 +1222,21 @@ function getMatch(matchKey) {
 }
 
 function getCurrentTeamNumberFromRobot() {
-  if (getRobot() != "" && typeof getRobot() !== 'undefined' && getCurrentMatch() != "") {
-    if (getRobot().charAt(0) == "r") {
-      return getCurrentMatch().red.team_keys[parseInt(getRobot().charAt(1)) - 1]
-    } else if (getRobot().charAt(0) == "b") {
-      return getCurrentMatch().blue.team_keys[parseInt(getRobot().charAt(1)) - 1]
-    }
-  }
+  let match = document.getElementById("input_m").value;
+  let robot = document.getElementById("input_r").value;
+
+  let row = scoutingSchedule.find(entry => 
+    entry.match == match && entry.robot.toLowerCase() == robot.toLowerCase()
+  );
+
+  return row ? row.team_number : "";
 }
+function getTeamName(teamNumber) {
+  let row = scoutingSchedule.find(entry => entry.team_number == teamNumber);
+  return row ? row.team_name : "";
+}
+
+
 
 function getCurrentMatchKey() {
   return document.getElementById("input_e").value + "_" + getLevel() + document.getElementById("input_m").value;
@@ -1413,8 +1420,22 @@ function copyData(){
   document.getElementById('copyButton').setAttribute('value','Copied');
 }
 
+let scoutingSchedule = [];
+
+function loadScoutingCSV() {
+  Papa.parse("data/schedule.csv", {
+    download: true,
+    header: true,
+    complete: function(results) {
+      scoutingSchedule = results.data;
+      console.log("Scouting schedule loaded:", scoutingSchedule);
+    }
+  });
+}
+
 window.onload = function () {
   let ret = configure();
+  loadScoutingCSV();
   if (ret != -1) {
     let ece = document.getElementById("input_e");
     let ec = null;
@@ -1432,3 +1453,4 @@ window.onload = function () {
     }
   }
 };
+
