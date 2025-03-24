@@ -12,12 +12,6 @@ var config_data = `
       "maxSize": 5,
       "required": "true"
     },
-    { "name": "Event",
-      "code": "e",
-      "type": "event",
-      "defaultValue": "2025ohmv",
-      "required": "true"
-    },
     { "name": "Match Level",
       "code": "l",
       "type": "level",

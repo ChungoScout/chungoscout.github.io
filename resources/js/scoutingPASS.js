@@ -1209,17 +1209,6 @@ function getTeamName(teamNumber) {
   return "";
 }
 
-function getMatch(matchKey) {
-  //This needs to be different than getTeamName() because of how JS stores their data
-  if (matchKey !== undefined) {
-    if (schedule) {
-      var ret = "";
-      Array.from(schedule).forEach(match => ret = match.key == matchKey ? match.alliances : ret);
-      return ret;
-    }
-  }
-  return "";
-}
 
 function getCurrentTeamNumberFromRobot() {
   let match = document.getElementById("input_m").value;
@@ -1237,32 +1226,17 @@ function getTeamName(teamNumber) {
 }
 
 
-
-function getCurrentMatchKey() {
-  return document.getElementById("input_e").value + "_" + getLevel() + document.getElementById("input_m").value;
-}
-
-function getCurrentMatch() {
-  return getMatch(getCurrentMatchKey());
-}
-
 function updateMatchStart(event) {
-  if ((getCurrentMatch() == "") ||
-    (!teams)) {
-    console.log("No match or team data.");
-    return;
-  }
-  if (event.target.id.startsWith("input_r")) {
-    document.getElementById("input_t").value = getCurrentTeamNumberFromRobot().replace("frc", "");
+  const match = document.getElementById("input_m").value;
+  const robot = document.getElementById("input_r").value;
+
+  if (match && robot) {
+    const team = getCurrentTeamNumberFromRobot();
+    document.getElementById("input_t").value = team;
     onTeamnameChange();
   }
-  if (event.target.id == "input_m") {
-    if (getRobot() != "" && typeof getRobot()) {
-      document.getElementById("input_t").value = getCurrentTeamNumberFromRobot().replace("frc", "");
-      onTeamnameChange();
-    }
-  }
 }
+
 
 function onTeamnameChange(event) {
   var newNumber = document.getElementById("input_t").value;
@@ -1435,22 +1409,14 @@ function loadScoutingCSV() {
 
 window.onload = function () {
   let ret = configure();
-  loadScoutingCSV();
+  loadScoutingCSV(); 
   if (ret != -1) {
-    let ece = document.getElementById("input_e");
-    let ec = null;
-    if (ece != null) {
-      ec = ece.value;
-    }
-    if (ec != null) {
-      getTeams(ec);
-      getSchedule(ec);
-    }
-    this.drawFields();
+    drawFields();
     if (enableGoogleSheets) {
       console.log("Enabling Google Sheets.");
       setUpGoogleSheets();
     }
   }
 };
+
 
