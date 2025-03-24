@@ -803,7 +803,11 @@ function validateData() {
   var errStr = "";
   for (rf of requiredFields) {
     var thisRF = document.forms.scoutingForm[rf];
-	if (thisRF.value == "[]" || thisRF.value.length == 0) {
+    if (
+      thisRF.value.length == 0 ||
+      thisRF.value === "[]" || 
+      (thisRF.value.startsWith("[") && thisRF.value.endsWith("]") && JSON.parse(thisRF.value).length === 0)
+    ) {
 	  if (rf == "as") {
 		rftitle = "Auto Start Position"
 	  } else {
