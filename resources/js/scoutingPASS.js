@@ -1242,7 +1242,7 @@ function getCurrentTeamNumberFromRobot() {
 
 function updateMatchStart(event) {
   const match = document.getElementById("input_m").value;
-  const robot = document.getElementById("input_r").value;
+  const robot = document.querySelector('input[name="r"]:checked')?.value;
 
   if (match && robot) {
     const team = getCurrentTeamNumberFromRobot();
@@ -1250,6 +1250,7 @@ function updateMatchStart(event) {
     onTeamnameChange();
   }
 }
+
 
 
 function onTeamnameChange(event) {
