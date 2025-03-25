@@ -1253,7 +1253,17 @@ function updateMatchStart(event) {
   console.log("[updateMatchStart] Running…");
 
   const match = document.getElementById("input_m").value;
-  const robot = document.getElementById("input_r").value;
+
+  // Get selected robot from radio buttons
+  let robot = "";
+  let radios = document.getElementsByName("r");
+  for (const r of radios) {
+    if (r.checked) {
+      robot = r.value;
+      break;
+    }
+  }
+
   console.log(`[updateMatchStart] Match: ${match}, Robot: ${robot}`);
 
   if (match && robot) {
@@ -1261,7 +1271,8 @@ function updateMatchStart(event) {
     const teamName = getTeamName(team);
     console.log(`[updateMatchStart] Found team #${team} (${teamName})`);
 
-    document.getElementById("input_t").value = team;
+    const inputT = document.getElementById("input_t");
+    if (inputT) inputT.value = team;
 
     const label = document.getElementById("display_qr-info");
     if (label && team && teamName) {
@@ -1273,6 +1284,7 @@ function updateMatchStart(event) {
     }
   }
 }
+
 
 
 
