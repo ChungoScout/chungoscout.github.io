@@ -920,23 +920,21 @@ function updateQRHeader() {
 
 
 function qr_regenerate() {
-  // Validate required pre-match date (event, match, level, robot, scouter)
-  if (!pitScouting) {  
-    if (validateData() == false) {
-      // Don't allow a swipe until all required data is filled in
-      return false
-    }
+  console.log("[qr_regenerate] Triggered");
+
+  if (!pitScouting && validateData() == false) {
+    console.warn("[qr_regenerate] Validation failed");
+    return false;
   }
 
-  // Get data
-  data = getData(dataFormat)
+  updateMatchStart(); // Make sure this is called
+  const data = getData(dataFormat);
+  console.log(`[qr_regenerate] Data: ${data}`);
 
-  // Regenerate QR Code
-  qr.makeCode(data)
-
-  updateQRHeader()
-  return true
+  qr.makeCode(data);
+  return true;
 }
+
 
 function qr_clear() {
   qr.clear()
@@ -1252,25 +1250,30 @@ function getCurrentTeamNumberFromRobot() {
 
 
 function updateMatchStart(event) {
-  const match = document.getElementById("input_m")?.value;
-  const robot = document.querySelector("input[name='r']:checked")?.value;
+  console.log("[updateMatchStart] Running…");
+
+  const match = document.getElementById("input_m").value;
+  const robot = document.getElementById("input_r").value;
+  console.log(`[updateMatchStart] Match: ${match}, Robot: ${robot}`);
 
   if (match && robot) {
-    const row = scoutingSchedule.find(entry =>
-      entry.match == match && entry.robot.toLowerCase() == robot.toLowerCase()
-    );
+    const team = getCurrentTeamNumberFromRobot();
+    const teamName = getTeamName(team);
+    console.log(`[updateMatchStart] Found team #${team} (${teamName})`);
 
-    if (row) {
-      const teamNumber = row.team_number;
-      document.getElementById("input_t").value = teamNumber;
-      updateQRHeader(); // update the QR info label
-    } else {
-      console.warn(`No team found for Match ${match}, Robot ${robot}`);
-      document.getElementById("input_t").value = "";
-      updateQRHeader(); // still update header with fallback
+    document.getElementById("input_t").value = team;
+
+    const label = document.getElementById("display_qr-info");
+    if (label && team && teamName) {
+      label.textContent = `Scouting Team ${team} – ${teamName}`;
+    } else if (label && team) {
+      label.textContent = `Scouting Team ${team}`;
+    } else if (label) {
+      label.textContent = `Scouting Info`;
     }
   }
 }
+
 
 
 
