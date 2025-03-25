@@ -48,8 +48,8 @@
 					<p></p>
 					<p class="match-label"><input type="button" value="Display Data" id="displayButton" onclick="displayData()"><input type="button" value="Copy Data" id="copyButton" onclick="copyData()"></p>
 					<div id="submitButton">
-						<button id="submit" type="submit" class="submitForm">Send to Google Sheets</button>
-					</div>
+						<button id="submit" type="button" onclick="submitData()" class="submitForm">Send Data to CSV</button>
+					</div>					
 					<div id="clearButton">
 						<button type="button" class="clearForm" onclick="clearForm()">Clear Form</button>
 					</div>
@@ -59,3 +59,28 @@
 		</body>
 	</form>
 </html>
+<script>
+	// This function uses your existing getData(dataFormat) function
+	function submitData() {
+	  // Retrieve your formatted data (e.g., TSV or as defined by your app)
+	  const data = getData(dataFormat);
+	  const payload = data.endsWith("\n") ? data : data + "\n";
+  
+	  // Send the data to your PHP script
+	  fetch('/submit.php', {
+		method: 'POST',
+		headers: { 'Content-Type': 'text/plain' },
+		body: payload
+	  })
+	  .then(response => response.text())
+	  .then(result => {
+		console.log(result);
+		alert("Data submitted successfully!");
+	  })
+	  .catch(error => {
+		console.error("Error submitting data:", error);
+		alert("Error submitting data. Please try again.");
+	  });
+	}
+  </script>
+  

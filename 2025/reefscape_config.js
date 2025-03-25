@@ -1,7 +1,7 @@
 var config_data = `
 {
   "dataFormat": "tsv",
-  "title": "Scouting PASS 2025",
+  "title": "5492 Scouting",
   "page_title": "REEFSCAPE",
   "checkboxAs": "10",
   "prematch": [
@@ -10,12 +10,6 @@ var config_data = `
       "type": "scouter",
       "size": 5,
       "maxSize": 5,
-      "required": "true"
-    },
-    { "name": "Event",
-      "code": "e",
-      "type": "event",
-      "defaultValue": "2025ohmv",
       "required": "true"
     },
     { "name": "Match Level",
@@ -49,12 +43,6 @@ var config_data = `
       },
       "required":"true"
     },
-    { "name": "Team #",
-      "code": "t",
-      "type": "team",
-      "min": 1,
-      "max": 99999
-    },
     { "name": "Auto Start Position",
       "code": "as",
       "type": "clickable_image",
@@ -62,7 +50,8 @@ var config_data = `
       "clickRestriction": "one",
       "dimensions": "6 6",
       "allowableResponses": "1 7 13 19 25 31",
-      "shape": "circle 5 black red true"
+      "shape": "circle 5 black red true",
+      "required": "true"
     }
   ],
   "auton": [

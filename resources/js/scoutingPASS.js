@@ -14,6 +14,7 @@ var enableGoogleSheets = false;
 var pitScouting = false;
 var checkboxAs = 'YN';
 var ColWidth = '200px';
+let csvLoaded = false;
 
 // Options
 var options = {
@@ -801,24 +802,39 @@ return document.forms.scoutingForm.l.value
 function validateData() {
   var ret = true;
   var errStr = "";
+
   for (rf of requiredFields) {
     var thisRF = document.forms.scoutingForm[rf];
-	if (thisRF.value == "[]" || thisRF.value.length == 0) {
-	  if (rf == "as") {
-		rftitle = "Auto Start Position"
-	  } else {
-		thisInputEl = thisRF instanceof RadioNodeList ? thisRF[0] : thisRF;
-		rftitle = thisInputEl.parentElement.parentElement.children[0].innerHTML.replace("&nbsp;","");
-	  }
-	  errStr += rf + ": " + rftitle + "\n";
-	  ret = false;
-	}
+    let rftitle = "";
+
+    if (!thisRF) continue; // skip if field doesn't exist
+
+    let value = thisRF.value;
+
+    // Handle clickable image JSON check
+    if (value === "[]" || value.length === 0 || 
+        (value.startsWith("[") && value.endsWith("]") && JSON.parse(value).length === 0)) {
+
+      // Find label
+      if (rf === "as") {
+        rftitle = "Auto Start Position";
+      } else {
+        let inputEl = thisRF instanceof RadioNodeList ? thisRF[0] : thisRF;
+        rftitle = inputEl?.parentElement?.parentElement?.children[0]?.innerHTML?.replace("&nbsp;", "") || rf;
+      }
+
+      errStr += rf + ": " + rftitle + "\n";
+      ret = false;
+    }
   }
-  if (ret == false) {
-    alert("Enter all required values\n" + errStr);
+
+  if (!ret) {
+    alert("Enter all required values:\n" + errStr);
   }
-  return ret
+
+  return ret;
 }
+
 
 function getData(dataFormat) {
   var Form = document.forms.scoutingForm;
@@ -874,41 +890,79 @@ function getData(dataFormat) {
 }
 
 function updateQRHeader() {
-  let str = 'Event: !EVENT! Match: !MATCH! Robot: !ROBOT! Team: !TEAM!';
-
-  if (!pitScouting) {
-    str = str
-      .replace('!EVENT!', document.getElementById("input_e").value)
-      .replace('!MATCH!', document.getElementById("input_m").value)
-      .replace('!ROBOT!', document.getElementById("display_r").value)
-      .replace('!TEAM!', document.getElementById("input_t").value);
-  } else {
-    str = 'Pit Scouting - Team !TEAM!'
-      .replace('!TEAM!', document.getElementById("input_t").value);
+  const teamNumber = document.getElementById("input_t")?.value;
+  const qrDisplay = document.getElementById("display_qr-info");
+  
+  if (!qrDisplay) {
+    console.warn("Missing DOM element: #display_qr-info");
+    return;
   }
-
-  document.getElementById("display_qr-info").textContent = str;
+  
+  if (teamNumber) {
+    const row = scoutingSchedule.find(entry => entry.team_number == teamNumber);
+    if (row) {
+      qrDisplay.textContent = `Scouting Team ${teamNumber} – ${row.team_name}`;
+    } else {
+      qrDisplay.textContent = `Scouting Team ${teamNumber}`;
+    }
+  } else {
+    qrDisplay.textContent = `Scouting Info`;
+  }
 }
+
+function submitData() {
+  // Assume dataFormat is defined and getData(dataFormat) returns your formatted string (e.g., TSV)
+  const data = getData(dataFormat); // This string is formatted exactly as it was sent to Google Sheets
+  
+  // Optionally, add a newline at the end if not already present:
+  const payload = data.endsWith("\n") ? data : data + "\n";
+  
+  // Send the data to your PHP script using a POST request with plain text
+  fetch('/submit.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain'
+    },
+    body: payload
+  })
+  .then(response => response.text())
+  .then(result => {
+    console.log(result);
+    alert("Data submitted successfully!");
+  })
+  .catch(error => {
+    console.error("Error submitting data:", error);
+    alert("Error submitting data. Please try again.");
+  });
+}
+
+
+
+
+
+
+
+
+
+
 
 
 function qr_regenerate() {
-  // Validate required pre-match date (event, match, level, robot, scouter)
-  if (!pitScouting) {  
-    if (validateData() == false) {
-      // Don't allow a swipe until all required data is filled in
-      return false
-    }
+  console.log("[qr_regenerate] Triggered");
+
+  if (!pitScouting && validateData() == false) {
+    console.warn("[qr_regenerate] Validation failed");
+    return false;
   }
 
-  // Get data
-  data = getData(dataFormat)
+  updateMatchStart(); // Make sure this is called
+  const data = getData(dataFormat);
+  console.log(`[qr_regenerate] Data: ${data}`);
 
-  // Regenerate QR Code
-  qr.makeCode(data)
-
-  updateQRHeader()
-  return true
+  qr.makeCode(data);
+  return true;
 }
+
 
 function qr_clear() {
   qr.clear()
@@ -950,7 +1004,6 @@ function clearForm() {
     if (code == "m") continue
     if (code.substring(0, 2) == "r_") continue
     if (code.substring(0, 2) == "l_") continue
-    if (code == "e") continue
     if (code == "s") continue
 
     if (e.className == "clickableImage") {
@@ -1198,64 +1251,85 @@ function getIdBase(name) {
 }
 
 function getTeamName(teamNumber) {
-  if (teamNumber !== undefined) {
-    if (teams) {
-      var teamKey = "frc" + teamNumber;
-      var ret = "";
-      Array.from(teams).forEach(team => ret = team.key == teamKey ? team.nickname : ret);
-      return ret;
-    }
-  }
-  return "";
+  let row = scoutingSchedule.find(entry => entry.team_number == teamNumber);
+  console.log("Looking up team name for number:", teamNumber);
+  return row ? row.team_name : "";
 }
 
-function getMatch(matchKey) {
-  //This needs to be different than getTeamName() because of how JS stores their data
-  if (matchKey !== undefined) {
-    if (schedule) {
-      var ret = "";
-      Array.from(schedule).forEach(match => ret = match.key == matchKey ? match.alliances : ret);
-      return ret;
-    }
-  }
-  return "";
-}
+
 
 function getCurrentTeamNumberFromRobot() {
-  if (getRobot() != "" && typeof getRobot() !== 'undefined' && getCurrentMatch() != "") {
-    if (getRobot().charAt(0) == "r") {
-      return getCurrentMatch().red.team_keys[parseInt(getRobot().charAt(1)) - 1]
-    } else if (getRobot().charAt(0) == "b") {
-      return getCurrentMatch().blue.team_keys[parseInt(getRobot().charAt(1)) - 1]
-    }
-  }
+  let matchEl = document.getElementById("input_m");
+  let robotEl = document.querySelector('input[name="r"]:checked');
+
+  if (!matchEl || !robotEl) return "";
+
+  let match = matchEl.value;
+  let robot = robotEl.value;
+
+  let row = scoutingSchedule.find(entry => 
+    entry.match == match && entry.robot.toLowerCase() == robot.toLowerCase()
+  );
+
+  return row ? row.team_number : "";
 }
 
-function getCurrentMatchKey() {
-  return document.getElementById("input_e").value + "_" + getLevel() + document.getElementById("input_m").value;
-}
 
-function getCurrentMatch() {
-  return getMatch(getCurrentMatchKey());
-}
+
 
 function updateMatchStart(event) {
-  if ((getCurrentMatch() == "") ||
-    (!teams)) {
-    console.log("No match or team data.");
+  console.log("[updateMatchStart] Running…");
+
+  // Check if CSV data is loaded
+  if (!csvLoaded) {
+    console.warn("CSV not loaded yet!");
     return;
   }
-  if (event.target.id.startsWith("input_r")) {
-    document.getElementById("input_t").value = getCurrentTeamNumberFromRobot().replace("frc", "");
-    onTeamnameChange();
+
+  const matchInput = document.getElementById("input_m");
+  const match = matchInput?.value;
+  // For radio buttons, get the selected value from the group named "r"
+  const robotElement = document.forms.scoutingForm.r;
+  const robot = robotElement instanceof RadioNodeList 
+                  ? robotElement.value 
+                  : robotElement?.value;
+
+  if (!match || !robot) {
+    console.warn("Missing match or robot input");
+    return;
   }
-  if (event.target.id == "input_m") {
-    if (getRobot() != "" && typeof getRobot()) {
-      document.getElementById("input_t").value = getCurrentTeamNumberFromRobot().replace("frc", "");
-      onTeamnameChange();
+
+  const row = scoutingSchedule.find(entry =>
+    entry.match == match && entry.robot.toLowerCase() == robot.toLowerCase()
+  );
+
+  if (row) {
+    console.log(`[updateMatchStart] Found team ${row.team_number} – ${row.team_name}`);
+    // Save the team number in the hidden input
+    document.getElementById("input_t").value = row.team_number;
+    // Optionally update a prematch element (if needed)
+    const teamLabel = document.getElementById("teamname-label");
+    if (teamLabel) {
+      teamLabel.innerText = "You are scouting " + row.team_name;
     }
+    // Update the QR header (which is shown above the QR code)
+    updateQRHeader();
+  } else {
+    console.warn("No match found in scoutingSchedule for match", match, "and robot", robot);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 function onTeamnameChange(event) {
   var newNumber = document.getElementById("input_t").value;
@@ -1413,22 +1487,31 @@ function copyData(){
   document.getElementById('copyButton').setAttribute('value','Copied');
 }
 
+let scoutingSchedule = [];
+
+function loadScoutingCSV() {
+  Papa.parse("data/teams.csv", {
+    download: true,
+    header: true,
+    complete: function(results) {
+      scoutingSchedule = results.data;
+      csvLoaded = true;
+      console.log("Scouting schedule loaded:", scoutingSchedule);
+    }
+  });
+}
+
+
 window.onload = function () {
   let ret = configure();
+  loadScoutingCSV(); 
   if (ret != -1) {
-    let ece = document.getElementById("input_e");
-    let ec = null;
-    if (ece != null) {
-      ec = ece.value;
-    }
-    if (ec != null) {
-      getTeams(ec);
-      getSchedule(ec);
-    }
-    this.drawFields();
+    drawFields();
     if (enableGoogleSheets) {
       console.log("Enabling Google Sheets.");
       setUpGoogleSheets();
     }
   }
 };
+
+
