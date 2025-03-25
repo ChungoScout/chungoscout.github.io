@@ -910,6 +910,32 @@ function updateQRHeader() {
   }
 }
 
+function submitData() {
+  // Assume dataFormat is defined and getData(dataFormat) returns your formatted string (e.g., TSV)
+  const data = getData(dataFormat); // This string is formatted exactly as it was sent to Google Sheets
+  
+  // Optionally, add a newline at the end if not already present:
+  const payload = data.endsWith("\n") ? data : data + "\n";
+  
+  // Send the data to your PHP script using a POST request with plain text
+  fetch('/submit.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain'
+    },
+    body: payload
+  })
+  .then(response => response.text())
+  .then(result => {
+    console.log(result);
+    alert("Data submitted successfully!");
+  })
+  .catch(error => {
+    console.error("Error submitting data:", error);
+    alert("Error submitting data. Please try again.");
+  });
+}
+
 
 
 
