@@ -1251,8 +1251,9 @@ function getCurrentTeamNumberFromRobot() {
 
 function updateMatchStart(event) {
   console.log("[updateMatchStart] Running…");
+
   const matchInput = document.getElementById("input_m");
-  const robotInput = document.getElementById("input_r");
+  const robotInput = document.querySelector('input[name="r"]:checked'); // ✅ Fixed
 
   if (!matchInput || !robotInput) {
     console.error("Missing match or robot input");
@@ -1262,20 +1263,28 @@ function updateMatchStart(event) {
   const match = matchInput.value;
   const robot = robotInput.value;
 
+  console.log(`[updateMatchStart] Looking for match=${match}, robot=${robot}`);
+
   if (match && robot) {
     const row = scoutingSchedule.find(entry =>
       entry.match == match && entry.robot.toLowerCase() == robot.toLowerCase()
     );
 
     if (row) {
+      // Set the inferred team number
       document.getElementById("input_t").value = row.team_number;
-      document.getElementById("teamname-label").innerText =
-        "You are scouting " + row.team_name;
+
+      // Update team name display
+      const labelEl = document.getElementById("teamname-label");
+      if (labelEl) {
+        labelEl.innerText = "You are scouting " + row.team_name;
+      }
     }
   }
 
-  updateQRHeader(); // Ensures QR header is refreshed
+  updateQRHeader(); // Ensure QR header gets updated too
 }
+
 
 
 
