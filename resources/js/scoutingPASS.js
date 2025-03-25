@@ -892,12 +892,12 @@ function getData(dataFormat) {
 function updateQRHeader() {
   const teamNumber = document.getElementById("input_t")?.value;
   const qrDisplay = document.getElementById("display_qr-info");
-
+  
   if (!qrDisplay) {
     console.warn("Missing DOM element: #display_qr-info");
     return;
   }
-
+  
   if (teamNumber) {
     const row = scoutingSchedule.find(entry => entry.team_number == teamNumber);
     if (row) {
@@ -909,6 +909,7 @@ function updateQRHeader() {
     qrDisplay.textContent = `Scouting Info`;
   }
 }
+
 
 
 
@@ -1253,9 +1254,19 @@ function getCurrentTeamNumberFromRobot() {
 function updateMatchStart(event) {
   console.log("[updateMatchStart] Running…");
 
+  // Check if CSV data is loaded
+  if (!csvLoaded) {
+    console.warn("CSV not loaded yet!");
+    return;
+  }
+
   const matchInput = document.getElementById("input_m");
   const match = matchInput?.value;
-  const robot = document.forms.scoutingForm.r?.value;
+  // For radio buttons, get the selected value from the group named "r"
+  const robotElement = document.forms.scoutingForm.r;
+  const robot = robotElement instanceof RadioNodeList 
+                  ? robotElement.value 
+                  : robotElement?.value;
 
   if (!match || !robot) {
     console.warn("Missing match or robot input");
@@ -1268,16 +1279,20 @@ function updateMatchStart(event) {
 
   if (row) {
     console.log(`[updateMatchStart] Found team ${row.team_number} – ${row.team_name}`);
+    // Save the team number in the hidden input
     document.getElementById("input_t").value = row.team_number;
+    // Optionally update a prematch element (if needed)
     const teamLabel = document.getElementById("teamname-label");
     if (teamLabel) {
       teamLabel.innerText = "You are scouting " + row.team_name;
     }
+    // Update the QR header (which is shown above the QR code)
     updateQRHeader();
   } else {
     console.warn("No match found in scoutingSchedule for match", match, "and robot", robot);
   }
 }
+
 
 
 
