@@ -1,7 +1,7 @@
 var config_data = `
 {
   "dataFormat": "tsv",
-  "title": "Scouting PASS 2025",
+  "title": "5492 Scouting",
   "page_title": "REEFSCAPE",
   "checkboxAs": "10",
   "prematch": [
