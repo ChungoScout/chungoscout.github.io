@@ -88,7 +88,10 @@
 				</td><td width="5%">&nbsp;</td></tr>
 			</table>
 					<p></p>
-					<p class="match-label"><input type="button" value="Display Data" id="displayButton" onclick="displayData()"><input type="button" value="Submit Data" id="submitButton" onclick="submitData()"></p>
+					<p class="match-label"><input type="button" value="Display Data" id="displayButton" onclick="displayData()"><input type="button" value="Copy Data" id="copyButton" onclick="copyData()"></p>
+					<div id="submitButton">
+						<button id="submit" type="button" onclick="submitData()">Send Data to CSV</button>
+					</div>
 					<div id="clearButton">
 						<button type="button" class="clearForm" onclick="clearForm()">Clear Form</button>
 					</div>
