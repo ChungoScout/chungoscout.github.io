@@ -1221,6 +1221,7 @@ function getIdBase(name) {
 
 function getTeamName(teamNumber) {
   let row = scoutingSchedule.find(entry => entry.team_number == teamNumber);
+  console.log("Looking up team name for number:", teamNumber);
   return row ? row.team_name : "";
 }
 
@@ -1265,6 +1266,10 @@ function updateMatchStart(event) {
       }
     }
   }
+  console.log("Looking up team for Match:", match, "Robot:", robot);
+  console.log("Found team number:", team);
+
+
 }
 
 
