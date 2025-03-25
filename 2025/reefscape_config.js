@@ -43,12 +43,6 @@ var config_data = `
       },
       "required":"true"
     },
-    { "name": "Team #",
-      "code": "t",
-      "type": "team",
-      "min": 1,
-      "max": 99999
-    },
     { "name": "Auto Start Position",
       "code": "as",
       "type": "clickable_image",
