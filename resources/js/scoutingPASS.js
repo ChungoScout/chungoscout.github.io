@@ -14,6 +14,7 @@ var enableGoogleSheets = false;
 var pitScouting = false;
 var checkboxAs = 'YN';
 var ColWidth = '200px';
+let csvLoaded = false;
 
 // Options
 var options = {
@@ -1453,10 +1454,12 @@ function loadScoutingCSV() {
     header: true,
     complete: function(results) {
       scoutingSchedule = results.data;
+      csvLoaded = true;
       console.log("Scouting schedule loaded:", scoutingSchedule);
     }
   });
 }
+
 
 window.onload = function () {
   let ret = configure();
