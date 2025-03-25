@@ -889,21 +889,26 @@ function getData(dataFormat) {
 }
 
 function updateQRHeader() {
-  let teamNumber = document.getElementById("input_t")?.value;
-  let match = document.getElementById("input_m")?.value;
-  let robot = document.forms.scoutingForm.r?.value;
+  const teamNumber = document.getElementById("input_t")?.value;
+  const qrDisplay = document.getElementById("display_qr-info");
 
-  const entry = scoutingSchedule.find(e => 
-    e.match == match && e.robot.toLowerCase() == robot.toLowerCase()
-  );
+  if (!qrDisplay) {
+    console.warn("Missing DOM element: #display_qr-info");
+    return;
+  }
 
-  if (entry) {
-    document.getElementById("display_qr-info").textContent =
-      `Scouting Team ${entry.team_number} – ${entry.team_name}`;
+  if (teamNumber) {
+    const row = scoutingSchedule.find(entry => entry.team_number == teamNumber);
+    if (row) {
+      qrDisplay.textContent = `Scouting Team ${teamNumber} – ${row.team_name}`;
+    } else {
+      qrDisplay.textContent = `Scouting Team ${teamNumber}`;
+    }
   } else {
-    document.getElementById("display_qr-info").textContent = "Scouting Info";
+    qrDisplay.textContent = `Scouting Info`;
   }
 }
+
 
 
 
@@ -1247,30 +1252,26 @@ function getCurrentTeamNumberFromRobot() {
 
 
 function updateMatchStart(event) {
-  const match = document.getElementById("input_m").value;
-  const robot = document.forms.scoutingForm.r.value;
+  const match = document.getElementById("input_m")?.value;
+  const robot = document.querySelector("input[name='r']:checked")?.value;
 
   if (match && robot) {
-    const entry = scoutingSchedule.find(e => 
-      e.match == match && e.robot.toLowerCase() == robot.toLowerCase()
+    const row = scoutingSchedule.find(entry =>
+      entry.match == match && entry.robot.toLowerCase() == robot.toLowerCase()
     );
 
-    if (entry) {
-      // Set the hidden team number field manually if needed elsewhere
-      const hiddenInput = document.getElementById("input_t");
-      if (hiddenInput) hiddenInput.value = entry.team_number;
-
-      const label = document.getElementById("teamname-label");
-      if (label) {
-        label.innerText = `You are scouting ${entry.team_number} – ${entry.team_name}`;
-      }
+    if (row) {
+      const teamNumber = row.team_number;
+      document.getElementById("input_t").value = teamNumber;
+      updateQRHeader(); // update the QR info label
+    } else {
+      console.warn(`No team found for Match ${match}, Robot ${robot}`);
+      document.getElementById("input_t").value = "";
+      updateQRHeader(); // still update header with fallback
     }
   }
-  console.log("Looking up team for Match:", match, "Robot:", robot);
-  console.log("Found team number:", team);
-
-
 }
+
 
 
 
