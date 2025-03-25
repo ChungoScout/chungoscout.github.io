@@ -1253,10 +1253,15 @@ function updateMatchStart(event) {
   console.log("[updateMatchStart] Running…");
 
   const matchInput = document.getElementById("input_m");
-  const robotInput = document.querySelector('input[name="r"]:checked'); // ✅ Fixed
+  const robotInput = document.querySelector('input[name="r"]:checked');
 
-  if (!matchInput || !robotInput) {
-    console.error("Missing match or robot input");
+  if (!matchInput) {
+    console.warn("Match input not found.");
+    return;
+  }
+
+  if (!robotInput) {
+    console.warn("Robot not selected yet.");
     return;
   }
 
@@ -1271,19 +1276,26 @@ function updateMatchStart(event) {
     );
 
     if (row) {
-      // Set the inferred team number
-      document.getElementById("input_t").value = row.team_number;
-
-      // Update team name display
-      const labelEl = document.getElementById("teamname-label");
-      if (labelEl) {
-        labelEl.innerText = "You are scouting " + row.team_name;
+      // Set hidden team number input
+      const teamInput = document.getElementById("input_t");
+      if (teamInput) {
+        teamInput.value = row.team_number;
       }
+
+      // Update label if it exists
+      const label = document.getElementById("teamname-label");
+      if (label) {
+        label.innerText = `You are scouting ${row.team_name}`;
+      }
+
+      // Update QR header
+      updateQRHeader();
+    } else {
+      console.warn("No match found in scoutingSchedule for that robot+match.");
     }
   }
-
-  updateQRHeader(); // Ensure QR header gets updated too
 }
+
 
 
 
