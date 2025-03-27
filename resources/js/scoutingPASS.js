@@ -910,22 +910,27 @@ function updateQRHeader() {
   }
 }
 function rearrangeDataString(data) {
-  // Split the string into fields using tab as the separator
+  console.log("Original data:", data);
+  // Split the data string by tab characters
   let fields = data.split("\t");
+  console.log("Fields after splitting:", fields);
   
-  // Remove the team number from the first field and store it
+  // Remove and store the first field (team number)
   const teamNumber = fields[0];
-  
-  // Remove the first element entirely
+  // Create a new array without the first element
   fields = fields.slice(1);
+  console.log("Fields after removing team number:", fields);
   
   // Insert the team number at index 5 (6th position)
-  // If there are fewer than 5 fields, it will simply append at the end.
   fields.splice(5, 0, teamNumber);
+  console.log("Fields after inserting team number at index 5:", fields);
   
   // Join the fields back together with tab delimiters
-  return fields.join("\t");
+  const result = fields.join("\t");
+  console.log("Final rearranged data:", result);
+  return result;
 }
+
 
 
 function submitData() {
