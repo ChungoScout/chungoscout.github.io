@@ -911,33 +911,34 @@ function updateQRHeader() {
 }
 function rearrangeDataString(data) {
   console.log("Original data:", data);
-  // Split the data string by tab characters
   let fields = data.split("\t");
-  console.log("Fields after splitting:", fields);
-  
-  // Remove and store the first field (team number)
+  console.log("Original fields:", fields);
+  if (fields.length < 6) {
+    console.warn("Not enough fields to rearrange:", fields);
+    return data;
+  }
   const teamNumber = fields[0];
-  // Create a new array without the first element
-  fields = fields.slice(1);
-  console.log("Fields after removing team number:", fields);
-  
-  // Insert the team number at index 5 (6th position)
-  fields.splice(5, 0, teamNumber);
-  console.log("Fields after inserting team number at index 5:", fields);
-  
-  // Join the fields back together with tab delimiters
-  const result = fields.join("\t");
+  const newFields = fields.slice(1, 6).concat([teamNumber], fields.slice(6));
+  console.log("New fields:", newFields);
+  const result = newFields.join("\t");
   console.log("Final rearranged data:", result);
   return result;
 }
 
 
 
+
 function submitData() {
-  const originalData = getData(dataFormat); // Your formatted string (TSV)
+  // Retrieve the original formatted data string (TSV) from your getData function.
+  const originalData = getData(dataFormat);
+  
+  // Rearrange the data so that the team number (first field) moves to the 6th position.
   const rearrangedData = rearrangeDataString(originalData);
+  
+  // Ensure the payload ends with a newline (optional)
   const payload = rearrangedData.endsWith("\n") ? rearrangedData : rearrangedData + "\n";
   
+  // Send the payload to your PHP script
   fetch('/submit.php', {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' },
@@ -953,6 +954,7 @@ function submitData() {
     alert("Error submitting data. Please try again.");
   });
 }
+
 
 
 
