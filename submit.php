@@ -18,8 +18,8 @@ if ($data !== false && trim($data) !== '') {
         $teamNumber = array_shift($fields);
         error_log("Raw team number: " . $teamNumber);
         
-        // Convert the team number to an integer and then back to a string.
-        $teamNumber = strval((int) trim($teamNumber));
+        // Prepend a capital "T" to the team number after trimming whitespace.
+        $teamNumber = "T" . trim($teamNumber);
         error_log("Processed team number: " . $teamNumber);
 
         // Insert "2025OHMV" into the second position (index 1)
