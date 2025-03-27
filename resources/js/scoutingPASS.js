@@ -909,20 +909,39 @@ function updateQRHeader() {
     qrDisplay.textContent = `Scouting Info`;
   }
 }
+function rearrangeDataString(data) {
+  // Split the string into fields using tab as the separator
+  let fields = data.split("\t");
+  
+  // Remove the team number from the first field and store it
+  const teamNumber = fields[0];
+  
+  // Remove the first element entirely
+  fields = fields.slice(1);
+  
+  // Insert the team number at index 5 (6th position)
+  // If there are fewer than 5 fields, it will simply append at the end.
+  fields.splice(5, 0, teamNumber);
+  
+  // Join the fields back together with tab delimiters
+  return fields.join("\t");
+}
+
 
 function submitData() {
-  // Assume dataFormat is defined and getData(dataFormat) returns your formatted string (e.g., TSV)
-  const data = getData(dataFormat); // This string is formatted exactly as it was sent to Google Sheets
+  // Retrieve the original formatted data (e.g., TSV) from your getData() function
+  const originalData = getData(dataFormat);
   
-  // Optionally, add a newline at the end if not already present:
-  const payload = data.endsWith("\n") ? data : data + "\n";
+  // Rearrange the data so that the team number moves from the first to the 6th field
+  const rearrangedData = rearrangeDataString(originalData);
   
-  // Send the data to your PHP script using a POST request with plain text
+  // Ensure the payload ends with a newline (optional)
+  const payload = rearrangedData.endsWith("\n") ? rearrangedData : rearrangedData + "\n";
+  
+  // Send the payload to your PHP script
   fetch('/submit.php', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'text/plain'
-    },
+    headers: { 'Content-Type': 'text/plain' },
     body: payload
   })
   .then(response => response.text())
@@ -935,6 +954,8 @@ function submitData() {
     alert("Error submitting data. Please try again.");
   });
 }
+
+
 
 
 
