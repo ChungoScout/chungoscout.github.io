@@ -1490,16 +1490,35 @@ function copyData(){
 let scoutingSchedule = [];
 
 function loadScoutingCSV() {
-  Papa.parse("teams.csv", {
-    download: true,
-    header: true,
-    complete: function(results) {
-      scoutingSchedule = results.data;
+  fetch('teams.csv')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(csvText => {
+      const rows = csvText.trim().split('\n');
+      const headers = rows[0].split(',');
+
+      const data = rows.slice(1).map(row => {
+        const values = row.split(',');
+        const entry = {};
+        headers.forEach((header, index) => {
+          entry[header.trim()] = values[index]?.trim();
+        });
+        return entry;
+      });
+
+      scoutingSchedule = data;
       csvLoaded = true;
       console.log("Scouting schedule loaded:", scoutingSchedule);
-    }
-  });
+    })
+    .catch(error => {
+      console.error("Error loading CSV:", error);
+    });
 }
+
 
 
 window.onload = function () {
