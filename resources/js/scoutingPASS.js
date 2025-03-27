@@ -929,16 +929,10 @@ function rearrangeDataString(data) {
 
 
 function submitData() {
-  // Retrieve the original formatted data (e.g., TSV) from your getData() function
-  const originalData = getData(dataFormat);
-  
-  // Rearrange the data so that the team number moves from the first to the 6th field
+  const originalData = getData(dataFormat); // Your formatted string (TSV)
   const rearrangedData = rearrangeDataString(originalData);
-  
-  // Ensure the payload ends with a newline (optional)
   const payload = rearrangedData.endsWith("\n") ? rearrangedData : rearrangedData + "\n";
   
-  // Send the payload to your PHP script
   fetch('/submit.php', {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' },
@@ -954,6 +948,7 @@ function submitData() {
     alert("Error submitting data. Please try again.");
   });
 }
+
 
 
 
