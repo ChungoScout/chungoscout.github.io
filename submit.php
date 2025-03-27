@@ -38,7 +38,7 @@ if ($data !== false && trim($data) !== '') {
     }
 
     // Define the path to your CSV file.
-    $csvFile = "data.csv";
+    $csvFile = "data.txt";
 
     // Append the rearranged data to the file.
     if (file_put_contents($csvFile, $data, FILE_APPEND | LOCK_EX) !== false) {

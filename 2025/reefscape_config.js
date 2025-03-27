@@ -50,8 +50,7 @@ var config_data = `
       "clickRestriction": "one",
       "dimensions": "6 6",
       "allowableResponses": "1 7 13 19 25 31",
-      "shape": "circle 5 black red true",
-      "required": "true"
+      "shape": "circle 5 black red true"
     }
   ],
   "auton": [
