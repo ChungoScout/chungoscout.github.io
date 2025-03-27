@@ -16,13 +16,17 @@ if ($data !== false && trim($data) !== '') {
     if (count($fields) >= 6) {
         // Remove and store the team number from the first field.
         $teamNumber = array_shift($fields);
-        error_log("Team number: " . $teamNumber);
+        error_log("Raw team number: " . $teamNumber);
+        
+        // Convert the team number to an integer and then back to a string.
+        $teamNumber = strval((int) trim($teamNumber));
+        error_log("Processed team number: " . $teamNumber);
 
-        // Insert "OHMV" into the second position (index 1)
+        // Insert "2025OHMV" into the second position (index 1)
         array_splice($fields, 1, 0, "2025OHMV");
         error_log("After inserting OHMV: " . implode("\t", $fields));
 
-        // Insert the team number into the 6th position (index 5)
+        // Insert the processed team number into the 6th position (index 5)
         array_splice($fields, 5, 0, $teamNumber);
         error_log("After inserting team number at index 5: " . implode("\t", $fields));
 
